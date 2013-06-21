@@ -11,7 +11,7 @@ class NetDiscover {
 		$ci =& get_instance();
 		$networkAddress = $ci->config->item('network_address');
 		exec($this->_cmd.$networkAddress,$data);
-		$this->_hosts = $this->_parse($data);
+		$this->_parse($data);
 		return $this->_hosts;
 		
 	}
@@ -28,7 +28,7 @@ class NetDiscover {
 				$this->_hosts[$i]['vendor']=$networkInfo[4];
 				$i++;
 			}
-			return $this->_hosts;
+			
 	}
 
 }
