@@ -11,11 +11,14 @@ class Network extends CI_Controller{
 	}
 
 	public function index(){
+		$this->load->view('network/index');
+		
+	}
+
+	public function getHosts(){
 
 		$hosts = $this->netdiscover->getHosts();
-		if($_SERVER['REQUEST_METHOD']=="GET") {
-			print_r(json_encode($hosts));
-		}
+		print_r(json_encode($hosts));
 		
 	}
 
