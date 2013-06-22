@@ -4,7 +4,9 @@ if(!defined('BASEPATH')) exit('No Direct Access allowed');
 class Snmp {
   
   private $_host= null;
+
   public function getHostDetails($ip) {
+
     $this->_host['system Description']= $this->_systemDescription($ip); // call private function to poppulate these fields
     $this->_host['uptime']= $this->_upTime($ip);
     // get others too
@@ -12,9 +14,9 @@ class Snmp {
 
     $this->_host['cpu Utilization']= $this->_cpuUtilization($ip);
 
-    $this->_host['memory']= $this->_memory($ip);
+    $this->_host['storage type']= $this->_storageType($ip);
 
-    $this->_host['storage']= $this->_storage($ip);
+    $this->_host['storage space']= $this->_storageSpace($ip);
 
     $this->_host['disk Type']= $this->_diskType ($ip);
 
@@ -31,7 +33,7 @@ class Snmp {
   private function _cpuUtilization($ip) {
 
   	snmp_set_valueretrieval(SNMP_VALUE_PLAIN);
-	$cpuUtilization = @snmpwalk($ip, "public",".1.3.6.1.2.1.25.3.3.1.2","2000");
+	$cpuUtilization = @snmpwalk($ip, "public",".1.3.6.1.2.1.25.3.3.1.2","4000");
 	if($cpuUtilization != NULL) {
 		$i = 0;
 		foreach ($cpuUtilization as $value) {
@@ -57,35 +59,36 @@ class Snmp {
 	return $upTime;
   }
   
-  private function _memory($ip) {
+  private function _storageSpace($ip) {
 
-  	snmp_set_valueretrieval(SNMP_VALUE_PLAIN);
+  	
 	$storageSize = array();
 	$storageUsed = array();
-	$allocationUnit = @snmpwalk($ip, "public",".1.3.6.1.2.1.25.2.3.1.4","2000"); 
-	$size = @snmpwalk($value, "public",".1.3.6.1.2.1.25.2.3.1.5","2000"); 
-	$used = @snmpwalk($value, "public",".1.3.6.1.2.1.25.2.3.1.6","2000"); 
+	$memory = array();
+	snmp_set_valueretrieval(SNMP_VALUE_PLAIN);
+	$allocationUnit = @snmpwalk($ip, "public",".1.3.6.1.2.1.25.2.3.1.4","4000"); 
+	$size = @snmpwalk($ip, "public",".1.3.6.1.2.1.25.2.3.1.5","4000"); 
+	$used = @snmpwalk($ip, "public",".1.3.6.1.2.1.25.2.3.1.6","4000"); 
 	if($allocationUnit != NULL) {
 		$i = 0;
 		foreach ($allocationUnit as $value) {
-			$storageSize[$i]=$allocationUnit[$i]*$size[$i];
-			$sizeInGb=number_format($storageSize[$i]/(1024*1024*1024),2).'GB';
+			$stSize[$i]=$allocationUnit[$i]*$size[$i];
+			$sizeInGb=number_format($stSize[$i]/(1024*1024*1024),2).'GB';
 			$storageSize[$i]=$sizeInGb;
 			
-			$storageUsed[$i]=$allocationUnit[$i]*$used[$i];
-			$usedInGb=number_format($storageUsed[$i]/(1024*1024*1024),2).'GB';
+			$stUsed[$i]=$allocationUnit[$i]*$used[$i];
+			$usedInGb=number_format($stUsed[$i]/(1024*1024*1024),2).'GB';
 			$storageUsed[$i]=$usedInGb;
 			$i++;
-
 			$memory['size']=$storageSize;
-			$memory['used space']=$storageUsed;
-		}
+			$memory['used space']=$storageUsed;	
+		}	
 	}
 	return $memory;
     
   }
   
-  private function _storage($ip) {
+  private function _storageType($ip) {
 
   	snmp_set_valueretrieval(SNMP_VALUE_LIBRARY);
 	$storage = @snmpwalk($ip, "public",".1.3.6.1.2.1.25.2.3.1.3","8000");
@@ -112,8 +115,8 @@ class Snmp {
     
     $diskType = array();
 	snmp_set_valueretrieval(SNMP_VALUE_LIBRARY);
-	$diskType = @snmpwalk($ip, "public",".1.3.6.1.2.1.25.3.6.1.2","8000");
-	return $diskStorage;
+	$diskType = @snmpwalk($ip, "public",".1.3.6.1.2.1.25.3.6.1.2");
+	return $diskType;
   }
   
   private function _systemTime($ip) {
@@ -121,7 +124,7 @@ class Snmp {
     $systemTime = array();
 	snmp_set_valueretrieval(SNMP_VALUE_LIBRARY);
 	$systemTime = @snmpwalk($ip, "public", ".1.3.6.1.2.1.25.1.2","4000");
-	return $systemTime;
+	return $systemTime[0];
   }
   
   private function _systemDescription($ip) {
@@ -135,32 +138,34 @@ class Snmp {
 			$os=preg_grep('/^(Windows|Linux)/', $systemExplode);
 			$osString=implode("", $os);
 			preg_match('/^[a-zA-z:\s0-9]+/', $value,$matches);
-			$systemDescription['os']=$str;
+			$systemDescription['os']=$osString;
 			$systemDescription['descripyion']=$matches[0];
 		}
-		}
+	}
 	return $systemDescription;
   }
   
   private function _installedSoftwares($ip) {
 	
 	$installedSoftwares = array();
-	$installedSoftwares = @snmpwalk($value, "public", ".1.3.6.1.2.1.25.6.3.1.2","8000");
+	snmp_set_valueretrieval(SNMP_VALUE_LIBRARY);
+	$installedSoftwares = @snmpwalk($ip, "public", ".1.3.6.1.2.1.25.6.3.1.2","8000");
 	return $installedSoftwares;
-	}
   }
   
   private function _services($ip) {
    
     $services = array();
-	$services = @snmpwalk($value, "public", ".1.3.6.1.2.1.25.4.2.1.2","8000");
+    snmp_set_valueretrieval(SNMP_VALUE_LIBRARY);
+	$services = @snmpwalk($ip, "public", ".1.3.6.1.2.1.25.4.2.1.2","8000");
 	return $services;
   }
   
   private function _serviceTypes($ip) {
    
-    $serviceTypes = array();	
-	$serviceTypes = @snmpwalk($value, "public", ".1.3.6.1.2.1.25.4.2.1.6","8000");
+    $serviceTypes = array();
+    snmp_set_valueretrieval(SNMP_VALUE_LIBRARY);	
+	$serviceTypes = @snmpwalk($ip, "public", ".1.3.6.1.2.1.25.4.2.1.6","8000");
 	return $serviceTypes;
   }
 
