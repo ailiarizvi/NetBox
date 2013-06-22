@@ -1,25 +1,24 @@
 <?php
 if(!defined('BASEPATH')) exit('No Direct Access allowed');
 
-class Host extends CI_Controller{
+class Host extends CI_Controller {
 
-	public $hosts=null;
 
-	function __construct(){
+	function __construct() {
+		
 		parent::__construct();
+		$this->load->library('netdiscover');
 	}
 
-	public function index(){
-		$this->scan();
-		print_r($this->host);
+	public function index() {
+		$this->load->view('network/index');
 
 	}
 
-	private function scan(){
-		require('netdiscover.php');
-		$network = new netdiscover();
-		$this->host = $network->index();
-		print_r($this->host);
+	private function scan() {
+		$hosts = $this->netdiscover->getHosts();
+		print_r(json_encode($hosts));
+		
 	}
 
-	}
+}
