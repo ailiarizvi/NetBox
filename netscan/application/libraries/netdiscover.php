@@ -3,7 +3,7 @@ if(!defined('BASEPATH')) exit('No Direct Access allowed');
 
 class NetDiscover {
 
-	private $_cmd='sudo netdiscover -P -i eth0 -r ';
+	private $_cmd='sudo netdiscover -P -i eth1 -r ';
 
 	public $_hosts = null;
 

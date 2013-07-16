@@ -3,8 +3,7 @@ if(!defined('BASEPATH')) exit('No Direct Access allowed');
 
 class Host extends CI_Controller{
 
-	public $ip = '192.168.0.100';
-
+	
 	function __construct(){
 		
 		parent::__construct();
@@ -13,14 +12,15 @@ class Host extends CI_Controller{
 
 	public function index(){
 		$this->load->view('host/index');
-		//$this->getHostInfo();
 	}
 
 	public function getHostInfo(){
 
-		$host = $this->snmp->getHostDetails($this->ip);
+		$ip = $_GET['ip'];
+		$host = $this->snmp->getHostDetails($ip);
+	//	echo "<pre>";
 		print_r(json_encode($host));
-		
+
 	}
 
 }

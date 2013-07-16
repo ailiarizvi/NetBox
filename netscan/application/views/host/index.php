@@ -6,7 +6,7 @@
 <script type="text/javascript">
 
 $(document).ready(function(){	
-	$.getJSON("http://localhost/netbox/netscan/host/gethostinfo",function(result){
+	$.getJSON("http://localhost/netbox/netscan/host/gethostinfo?ip=192.168.15.50",function(result){
 	alert(JSON.stringify(result));
 	});
 });

@@ -13,4 +13,4 @@
 | 
 |
 */
-$config['network_address']	= '192.168.0.101/24';
+$config['network_address']	= '192.168.0.0/24';
