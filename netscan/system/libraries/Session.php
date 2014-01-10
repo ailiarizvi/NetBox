@@ -33,7 +33,7 @@ class CI_Session {
 	var $sess_expire_on_close		= FALSE;
 	var $sess_match_ip				= FALSE;
 	var $sess_match_useragent		= TRUE;
-	var $sess_cookie_name			= 'ci_session';
+	var $sess_cookie_name			= 'users';
 	var $cookie_prefix				= '';
 	var $cookie_path				= '';
 	var $cookie_domain				= '';
